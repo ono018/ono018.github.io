@@ -1,0 +1,131 @@
+---
+title: "SKDE - Intervju"
+author: "Oyvind K. Nordgard"
+date: "12 september 2018"
+output: slidy_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(readxl)
+library(ggplot2)
+getwd()
+setwd("D:/Rstudio/SKDE")
+```
+
+
+```{r include = FALSE}
+library(readxl)
+library(readr)
+Eksempeldata <- read.csv("D:/Rstudio/Eksempeldata.csv", sep=";")
+
+```
+
+##SKDE OPPGAVESETT## 
+
+* **Oppgave 1**
+
+**Hva ville du ønske å vite om hver variabel for å kunne bruke de i en rapport/grafisk fremstilling?**
+
+
+* **[1] SkjemaID:** Er i seg selv selvforklarende - basert på den tanken at registrerte inndata stammer fra dette skjemaet. 
+* **[2] PatientInRegistryID:** På samme måte er denne det - ID til pasient - og dermed hvilken pasient som "eier" inndata.
+* **[3] Respirator:** Denne variabelen er nok desto mer interessant, ettersom man på bakgrunn av variabel-navnet ikke kan vite noe om verdiene direkte. F. eks., er 1=ja, og 2=nei, eller står det for noe annet? Videre så kan en jo spørre seg om det er snakk om et respirator *apparat*, eller om det f. eks er snakk om hvorvidt pasienten viser tegn til respirasjon, dvs. hvorvidt pasienten puster tilfredsstillende eller ikke. Altså om det er et apparat som er brukt, eller om variabelen sier noe om tilstanden til pasienten. 
+* **[4] DateAdmitted:** Dato pasienten er innlagt
+* **[5] ReAdmitted:** Hvorvidt pasienten er innlagt på nytt eller ikke
+
+##SKDE OPPGAVESETT## 
+
+
+* **[6] PrimaryReasonAdmitted:** Her ville jeg ønsket å vite hva de 11 forskjellige gruppene står for. Da f. eks. for å kunne kommentere hvorvidt pasienter innlagt for sykdom x, har større sannsynlighet for å bli innlagt på nytt igjen (gitt at ReAdmitted er kvalitetsindikatoren).
+* **[7] DateDischarged:** Dato pasienten er innlagt.
+* **[8] DaysAdmitted:** Total varighet på opphold
+* **[9] PatientAge:** Alder på pasient
+* **[10] Respirator. 1:** På samme måte som **"Respirator"** variabelen, er denne variabelen ikke veldig intuitiv (i alle fall for en ikke medisiner). Med verdier fra 0 - 94.20, samt NA verdier, kan det tenkes at denne variabelen sier noe om tilstanden til pasienten. Et annet spørsmål hadde f. eks. vært om den korrelerer med andre variabler. 
+
+##SKDE OPPGAVESETT## 
+
+
+* **[11] TypeOfAdmission:** Denne variabelen er i utgangspunktet ok, men ved gjennomgang av dataset finner en tre typer verdier - 8, 6 og 0. Verdiene trenger derfor å bli definert (hvilken er hhv. elektiv og øhjelp?), men en trenger også å vite hva står siste verdi for. 
+* **[12] DischargedStatus:** 
+* **[13] ChronicDiseases:** Verdiene under denne variabelen går fra -1 til 17. Her hadde det vært ønskelig å vite hvorvidt det f. eks. er snakk om antall kroniske sykdommer (noe som i seg selv virker rart da det i intervallet kun er observert -1, 0, 9, 10 og 17).
+* **[14] Saps2ScoreNumber:** Saps2Score er en test som skal forutsi dødelighet, hvor pasient scorer en verdi i intervallet fra 0 til 163.*"The Simplified Acute Physiology Score (SAPS II) is a severity score and mortality estimation tool developed from a large sample of medical and surgical patients in North America and Europe."*
+* **[15] Saps2Score:** På samme måte som overnevnte variabel baseres denne seg på samme test. Her er det derimot snakk om en prosentvis antagelse, dvs. estimert dødelighet på x prosent. 
+* **[16] SykehusNavn:** 
+
+
+##SKDE OPPGAVESETT## 
+
+* **Oppgave 2**
+
+**"Lag et metadatasett som beskriver alle variable og deres egenskaper. (Dikt opp der du ikke har mulighet for å vite alle detaljer du ønsker å vite om variabelen)"**
+
+![](D:/Rstudio/SKDE/Bilde1.png)
+
+##SKDE OPPGAVESETT## 
+
+![](D:/Rstudio/SKDE/Bilde2.png)
+
+
+
+##SKDE OPPGAVESETT## 
+
+* **Oppgave 3**
+
+**"Presenter kvalitetsindikatoren reinnleggelse. Dvs. visualiser den, tolk og forklar den slik at en ikke-medisiner kan lese og forstå presentasjonen. Reinnleggelse representeres av variabelen ReAdmitted hvor 1=ja og 2=nei."**
+
+```{r}
+a = (2 / 55) * 100
+b = (20 / 718) * 100
+c = (57 / 1818) * 100
+d = (24 / 546) * 100
+e = (25 / 1263) * 100
+f = (14 / 907) * 100
+g = (9 / 182) * 100
+h = (48 / 1485) * 100
+i = (50 / 1675) * 100
+j = (31 / 1071) * 100
+
+SykehusNavn <- c("Sykehus A", "Sykehus B", "Sykehus C", "Sykehus D", "Sykehus E", "Sykehus F", "Sykehus G", "Sykehus H", "Sykehus I", "Sykehus J")
+ReAdmitted_prosent <- c(a, b, c, d, e, f, g, h, i, j)
+
+x_name <- "SykehusNavn"
+y_name <- "ReAdmittedPercentage"
+
+NYED <- data.frame(SykehusNavn, ReAdmitted_prosent)
+names(NYED) <- c(x_name, y_name)
+
+ggplot(NYED,aes(x=reorder(SykehusNavn, -ReAdmittedPercentage),y=ReAdmittedPercentage)) + geom_bar(stat='identity', fill = "skyblue3") + coord_flip() +
+  labs(x= "Sykehus", y = "Reinnleggelse i prosent") + theme_bw() + 
+  geom_text(aes(label = round(ReAdmittedPercentage, digits = 2)), hjust = 3)
+
+a1 = (142 / 2728) * 100
+b1 = (49 / 1859) * 100
+c1 = (23 / 570) * 100
+d1 = (14 / 896) * 100
+e1 = (9 / 811) * 100
+f1 = (7 / 903) * 100
+g1 = (7 / 413) * 100
+h1 = (1 / 29) * 100
+i1 = (3 / 142) * 100
+j1 = (12 / 944) * 100
+k1 = (13 / 425) * 100
+
+PrimaryReasonAdmitted <- c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11")
+ReAdmitted_prosent <- c(a1, b1, c1, d1, e1, f1, g1, h1, i1, j1, k1)
+
+x_name <- "PrimaryReasonAdmitted"
+y_name <- "ReAdmittedPercentage"
+
+NYED <- data.frame(PrimaryReasonAdmitted, ReAdmitted_prosent)
+names(NYED) <- c(x_name, y_name)
+
+ggplot(NYED,aes(x=reorder(PrimaryReasonAdmitted, -ReAdmittedPercentage),y=ReAdmittedPercentage)) + geom_bar(stat='identity', fill = "skyblue3") + coord_flip() +
+  labs(x= "Hovedårsak innleggelse", y = "Reinnleggelse i prosent") + theme_bw() + 
+  geom_text(aes(label = round(ReAdmittedPercentage, digits = 2)), hjust = 3)
+
+```
+
+
+**Samvarierer reinnleggelse med andre ting i datasetet? F. eks. sammenheng med antall innleggelser og reinnleggelse (går antall reinnleggelser opp når antall innleggelser går opp?) Går kvaliteten ned når en har mange pasienter?** Hva er interessant(rate)? Forskjeller mellom sykehus, og forskjell mellom sykehus over tid. 
+
